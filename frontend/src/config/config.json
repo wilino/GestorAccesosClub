@@ -1,6 +1,6 @@
 {
     "development": {
-      "API_URL": "https://dev.api.clubvip.com"
+      "API_URL": "https://localhost:5001"
     },
     "production": {
       "API_URL": "https://api.clubvip.com"
