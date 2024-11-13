@@ -1,0 +1,8 @@
+{
+    "development": {
+      "API_URL": "https://dev.api.clubvip.com"
+    },
+    "production": {
+      "API_URL": "https://api.clubvip.com"
+    }
+  }
