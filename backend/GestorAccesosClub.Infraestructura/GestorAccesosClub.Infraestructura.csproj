@@ -6,4 +6,25 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.20" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="7.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Data\" />
+    <None Remove="Repositories\" />
+    <None Remove="Repositories\Implementaciones\" />
+    <None Remove="Repositories\Interfaces\" />
+    <None Remove="Decorators\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Data\" />
+    <Folder Include="Repositories\" />
+    <Folder Include="Repositories\Implementaciones\" />
+    <Folder Include="Repositories\Interfaces\" />
+    <Folder Include="Decorators\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GestorAccesosClub.Dominio\GestorAccesosClub.Dominio.csproj" />
+  </ItemGroup>
 </Project>

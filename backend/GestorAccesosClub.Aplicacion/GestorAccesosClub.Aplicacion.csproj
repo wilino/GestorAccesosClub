@@ -6,4 +6,28 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="Interfaces\" />
+    <None Remove="Services\" />
+    <None Remove="Decorators\" />
+    <None Remove="Parametros\" />
+    <None Remove="Parametros\Usuarios\" />
+    <None Remove="Parametros\Accesos\" />
+    <None Remove="Parametros\Clientes\" />
+    <None Remove="Parametros\Roles\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Interfaces\" />
+    <Folder Include="Services\" />
+    <Folder Include="Decorators\" />
+    <Folder Include="Parametros\" />
+    <Folder Include="Parametros\Usuarios\" />
+    <Folder Include="Parametros\Accesos\" />
+    <Folder Include="Parametros\Clientes\" />
+    <Folder Include="Parametros\Roles\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GestorAccesosClub.Dominio\GestorAccesosClub.Dominio.csproj" />
+    <ProjectReference Include="..\GestorAccesosClub.Infraestructura\GestorAccesosClub.Infraestructura.csproj" />
+  </ItemGroup>
 </Project>

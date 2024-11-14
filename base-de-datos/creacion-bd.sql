@@ -9,6 +9,11 @@ CREATE TABLE Roles (
     Descripcion VARCHAR(255)
 );
 
+-- Insertar datos iniciales en la tabla Roles 
+INSERT INTO Roles (RolId, Nombre, Descripcion) VALUES
+(1, 'admin', 'Administrador del sistema con acceso completo'),
+(2, 'cliente', 'Cliente del club con acceso limitado');
+
 -- Tabla Usuarios
 CREATE TABLE Usuarios (
     UsuarioId INT AUTO_INCREMENT PRIMARY KEY,
@@ -16,6 +21,7 @@ CREATE TABLE Usuarios (
     Email VARCHAR(100) NOT NULL UNIQUE,
     Contraseña VARCHAR(255) NOT NULL,
     RolId INT,
+    Estado INT DEFAULT 0, -- 0 para Activo, 1 para Inactivo, 2 para Suspendido
     FechaCreacion DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (RolId) REFERENCES Roles(RolId) ON DELETE SET NULL
 );
@@ -34,6 +40,6 @@ CREATE TABLE Accesos (
     AccesoId INT AUTO_INCREMENT PRIMARY KEY,
     UsuarioId INT NOT NULL,
     FechaAcceso DATETIME DEFAULT CURRENT_TIMESTAMP,
-    TipoAcceso ENUM('entrada', 'salida') NOT NULL,
+    TipoAcceso INT NOT NULL, -- 0 para Entrada, 1 para Salida
     FOREIGN KEY (UsuarioId) REFERENCES Usuarios(UsuarioId) ON DELETE CASCADE
 );

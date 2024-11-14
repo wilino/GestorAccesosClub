@@ -11,6 +11,29 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.19" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.20" />
+    <PackageReference Include="Scrutor" Version="4.1.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.31.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\GestorAccesosClub.Aplicacion\GestorAccesosClub.Aplicacion.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
+    <ProjectReference Include="..\GestorAccesosClub.Dominio\GestorAccesosClub.Dominio.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Controllers\" />
+    <None Remove="Configurations\" />
+    <None Remove="Models\" />
+    <None Remove="Decorators\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Controllers\" />
+    <Folder Include="Configurations\" />
+    <Folder Include="Models\" />
+    <Folder Include="Decorators\" />
+  </ItemGroup>
 </Project>
