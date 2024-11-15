@@ -16,6 +16,13 @@ namespace GestorAccesosClub.Infraestructura.Repositories.Implementaciones
         {
             return await _dbSet.FirstOrDefaultAsync(u => u.Email == email);
         }
+
+        public async Task<Usuario> GetByEmailAndPasswordAsync(string email, string password)
+        {
+            return await _context.Usuarios
+                .Include(u => u.Rol)
+                .FirstOrDefaultAsync(u => u.Email == email && u.Contraseña == password);
+        }
     }
 }
 

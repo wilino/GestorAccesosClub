@@ -1,11 +1,6 @@
-﻿// API/Controllers/AuthController.cs
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Mvc;
+using GestorAccesosClub.Aplicacion.Interfaces;
+using GestorAccesosClub.API.Models;
 
 namespace GestorAccesosClub.API.Controllers
 {
@@ -13,52 +8,24 @@ namespace GestorAccesosClub.API.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly IConfiguration _configuration;
+        private readonly IAuthService _authService;
 
-        public AuthController(IConfiguration configuration)
+        public AuthController(IAuthService authService)
         {
-            _configuration = configuration;
+            _authService = authService;
         }
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginModel login)
+        public async Task<IActionResult> Login([FromBody] LoginModel login)
         {
-            // Validar las credenciales del usuario (ejemplo: admin/admin)
-            if (login.Username == "admin" && login.Password == "admin")
-            {
-                var token = GenerarTokenJWT();
-                return Ok(new { token });
-            }
+            var token = await _authService.AuthenticateAsync(login.Email, login.Password);
 
-            return Unauthorized();
-        }
+            if (string.IsNullOrEmpty(token))
+                return Unauthorized(new { message = "Credenciales inválidas." });
 
-        private string GenerarTokenJWT()
-        {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var claims = new[]
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, "usuarioAdmin"),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.Role, "Admin")  // Ejemplo de rol
-            };
-
-            var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
-                claims: claims,
-                expires: DateTime.Now.AddHours(1),
-                signingCredentials: creds);
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            return Ok(new { token });
         }
     }
 
-    public class LoginModel
-    {
-        public string Username { get; set; }
-        public string Password { get; set; }
-    }
+    
 }

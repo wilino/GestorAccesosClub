@@ -30,4 +30,7 @@
     <ProjectReference Include="..\GestorAccesosClub.Dominio\GestorAccesosClub.Dominio.csproj" />
     <ProjectReference Include="..\GestorAccesosClub.Infraestructura\GestorAccesosClub.Infraestructura.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.31.0" />
+  </ItemGroup>
 </Project>

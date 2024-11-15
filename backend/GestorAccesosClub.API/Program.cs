@@ -1,18 +1,17 @@
-﻿// Program.cs
+﻿using GestorAccesosClub.API.Configurations;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configuración de servicios de la aplicación
+// Agregar servicios de la aplicación
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-
-// Configuración de Swagger para admitir JWT Bearer Token
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo { Title = "Gestor de Accesos Club API", Version = "v1" });
 
-    // Configuración del esquema de seguridad para JWT
+    // Configuración de autenticación JWT en Swagger
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -20,7 +19,7 @@ builder.Services.AddSwaggerGen(options =>
         Scheme = "Bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "Introduzca 'Bearer' seguido de un espacio y su token JWT en el campo de texto. \nEjemplo: 'Bearer su_token'"
+        Description = "Introduzca 'Bearer' seguido de un espacio y su token JWT.\nEjemplo: 'Bearer token_aqui'"
     });
 
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -39,8 +38,29 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+// Agregar servicios de la aplicación a través de DependencyInjection
+builder.Services.AddApplicationServices(builder.Configuration);
+
+// Configurar autenticación JWT
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
+                System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        };
+    });
+
 var app = builder.Build();
 
+// Configurar middleware
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -48,7 +68,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseAuthentication(); // Activa la autenticación
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
