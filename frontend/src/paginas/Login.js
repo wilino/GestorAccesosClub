@@ -1,27 +1,24 @@
+// src/paginas/Login.js
 import React, { useState } from 'react';
 import { Box, TextField, Button, Typography, Alert } from '@mui/material';
-import { useAuth } from '../../contextos/AuthContext';
+import { useAuth } from '../contextos/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
-const LoginForm = () => {
+const Login = () => {
   const { iniciarSesion } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setLoading(true);
     setError('');
 
-    const isAuthenticated = await iniciarSesion({ email, password });
-    setLoading(false);
-
-    if (isAuthenticated) {
-      navigate('/dashboard'); // Redirigir al dashboard si la autenticación es exitosa
-    } else {
+    try {
+      await iniciarSesion({ email, password });
+      navigate('/dashboard'); // Redirigir a dashboard al iniciar sesión correctamente
+    } catch (e) {
       setError('Credenciales incorrectas. Por favor, intente de nuevo.');
     }
   };
@@ -75,12 +72,11 @@ const LoginForm = () => {
         variant="contained"
         color="secondary"
         sx={{ mt: 2 }}
-        disabled={loading}
       >
-        {loading ? 'Cargando...' : 'Iniciar Sesión'}
+        Iniciar Sesión
       </Button>
     </Box>
   );
 };
 
-export default LoginForm;
+export default Login;

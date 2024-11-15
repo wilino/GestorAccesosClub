@@ -9,10 +9,12 @@ CREATE TABLE Roles (
     Descripcion VARCHAR(255)
 );
 
--- Insertar datos iniciales en la tabla Roles 
-INSERT INTO Roles (RolId, Nombre, Descripcion) VALUES
-(1, 'admin', 'Administrador del sistema con acceso completo'),
-(2, 'cliente', 'Cliente del club con acceso limitado');
+-- Insertar datos iniciales en la tabla Roles (correspondientes a TipoRol enum)
+-- Poblar la tabla Roles con los roles necesarios
+INSERT INTO Roles (Nombre, Descripcion) VALUES
+('admin', 'Administrador del sistema con acceso completo'),
+('cliente', 'Cliente del club con acceso limitado'),
+('personal_autorizado', 'Personal autorizado para gestionar accesos y clientes');
 
 -- Tabla Usuarios
 CREATE TABLE Usuarios (

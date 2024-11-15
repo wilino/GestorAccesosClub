@@ -1,31 +1,35 @@
+/* src/App.css */
+
+body {
+  margin: 0;
+  font-family: 'Roboto', Arial, sans-serif;
+  background-color: #121212; /* Fondo oscuro */
+  color: #ffffff; /* Texto principal en blanco */
+}
+
 .App {
   text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+}
+
+.App-header {
+  background-color: #212121; /* Gris oscuro */
+  padding: 1rem;
+  width: 100%;
+}
+
+.App-logo {
+  height: 100px;
+  pointer-events: none;
 }
 
 .App-link {
-  color: #61dafb;
+  color: #b2a429; /* Dorado */
+  text-decoration: none;
 }
 
 @keyframes App-logo-spin {
@@ -35,4 +39,37 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.Card {
+  background-color: #333333;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+  color: #ffffff;
+  margin-bottom: 1rem;
+}
+
+button {
+  text-transform: none;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+}
+
+button:disabled {
+  background-color: #666666;
+  color: #cccccc;
+}
+
+input, select, textarea {
+  background-color: #424242;
+  color: #ffffff;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: 2px solid #b2a429; /* Borde dorado en foco */
 }
