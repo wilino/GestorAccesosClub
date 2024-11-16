@@ -3,27 +3,26 @@ import { AppBar, Toolbar, Typography, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import NavItem from './NavItem';
 import DropdownMenu from './DropdownMenu';
+import { useAuth } from '../../../contextos/AuthContext';
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const { usuario, cerrarSesion } = useAuth();
   const isAuthenticated = !!localStorage.getItem('token');
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    cerrarSesion();
     navigate('/');
   };
 
   const accesosItems = [
-    { label: 'Detalle Accesos', to: '/accesos/DetalleAccesos' },
-    { label: 'Lista Accesos', to: '/accesos/ListaAccesos' },
+    { label: 'Gestor de Accesos', to: '/accesos' },
   ];
   const clientesItems = [
-    { label: 'Detalle Clientes', to: '/clientes/DetalleClientes' },
-    { label: 'Lista Clientes', to: '/clientes/ListaClientes' },
+    { label: 'Gestor de Clientes', to: '/clientes' },
   ];
   const usuariosItems = [
-    { label: 'Detalle Usuarios', to: '/usuarios/DetalleUsuario' },
-    { label: 'Lista Usuarios', to: '/usuarios/ListaUsuarios' },
+    { label: 'Gestor de Usuarios', to: '/usuarios' },
   ];
 
   return (
@@ -36,10 +35,24 @@ const Navbar = () => {
           {isAuthenticated ? (
             <>
               <NavItem to="/dashboard" label="Dashboard" />
-              <DropdownMenu label="Accesos" items={accesosItems} />
-              <DropdownMenu label="Clientes" items={clientesItems} />
-              <DropdownMenu label="Usuarios" items={usuariosItems} />
-              <button onClick={handleLogout} style={{ background: 'none', border: 'none', color: '#ffffff', cursor: 'pointer' }}>
+
+              {/* Mostrar accesos y clientes solo para personal autorizado */}
+              {usuario?.rol === 'personal_autorizado' && (
+                <>
+                  <DropdownMenu label="Accesos" items={accesosItems} />
+                  <DropdownMenu label="Clientes" items={clientesItems} />
+                </>
+              )}
+
+              {/* Mostrar usuarios solo para admin */}
+              {usuario?.rol === 'Admin' && (
+                <DropdownMenu label="Usuarios" items={usuariosItems} />
+              )}
+
+              <button
+                onClick={handleLogout}
+                style={{ background: 'none', border: 'none', color: '#ffffff', cursor: 'pointer' }}
+              >
                 Cerrar Sesión
               </button>
             </>

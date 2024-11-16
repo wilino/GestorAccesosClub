@@ -1,7 +1,9 @@
 ﻿using GestorAccesosClub.Aplicacion.Interfaces;
 using GestorAccesosClub.Aplicacion.Parametros.Clientes;
 using GestorAccesosClub.Dominio.Entities;
+using GestorAccesosClub.Dominio.Enums;
 using GestorAccesosClub.Infraestructura.Repositories.Interfaces;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace GestorAccesosClub.Aplicacion.Services
 {
@@ -18,9 +20,12 @@ namespace GestorAccesosClub.Aplicacion.Services
         {
             var cliente = new Cliente
             {
-                UsuarioId = parametros.UsuarioId,
                 Direccion = parametros.Direccion,
-                Telefono = parametros.Telefono
+                Telefono = parametros.Telefono,
+                TipoCliente=parametros.TipoCliente,
+                Email=parametros.Email,
+                Estado=parametros.Estado,
+                Nombre=parametros.Nombre
             };
 
             await _clienteRepository.CrearAsync(cliente);
@@ -37,6 +42,11 @@ namespace GestorAccesosClub.Aplicacion.Services
 
             cliente.Direccion = parametros.Direccion;
             cliente.Telefono = parametros.Telefono;
+            cliente.TipoCliente = parametros.TipoCliente;
+            cliente.Email = parametros.Email;
+            cliente.Estado = parametros.Estado;
+            cliente.Nombre = parametros.Nombre;
+
 
             await _clienteRepository.ActualizarAsync(cliente);
             return true;
@@ -62,11 +72,6 @@ namespace GestorAccesosClub.Aplicacion.Services
 
             await _clienteRepository.EliminarAsync(id);
             return true;
-        }
-
-        public async Task<IEnumerable<Cliente>> ObtenerClientesPorUsuarioIdAsync(int usuarioId)
-        {
-            return await _clienteRepository.ObtenerClientesPorUsuarioIdAsync(usuarioId);
         }
     }
 }

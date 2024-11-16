@@ -27,9 +27,12 @@ namespace GestorAccesosClub.API.Controllers
             var result = clientes.Select(cliente => new
             {
                 cliente.ClienteId,
-                cliente.Usuario.Nombre,
+                cliente.Nombre,
                 cliente.Direccion,
-                cliente.Telefono
+                cliente.Telefono,
+                cliente.TipoCliente,
+                cliente.Email,
+                cliente.Estado
             });
             return Ok(new ApiResponse(result, "Lista de clientes obtenida con éxito"));
         }
@@ -55,9 +58,12 @@ namespace GestorAccesosClub.API.Controllers
             var result = new
             {
                 cliente.ClienteId,
-                cliente.Usuario.Nombre,
+                cliente.Nombre,
                 cliente.Direccion,
-                cliente.Telefono
+                cliente.Telefono,
+                cliente.TipoCliente,
+                cliente.Email,
+                cliente.Estado
             };
 
             return Ok(new ApiResponse(result, "Cliente obtenido con éxito"));
@@ -103,7 +109,7 @@ namespace GestorAccesosClub.API.Controllers
                 return NotFound(response);
             }
 
-            return Ok(new ApiResponse(null, "Cliente actualizado exitosamente"));
+            return Ok(new ApiResponse(parametros, "Cliente actualizado exitosamente"));
         }
 
         /// <summary>

@@ -1,37 +1,85 @@
-// src/App.js
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './componentes/comunes/navbar/Navbar';
 import Dashboard from './paginas/Dashboard';
-import ListaUsuarios from './paginas/usuarios/ListaUsuarios';
-import ListaAccesos from './paginas/accesos/ListaAccesos';
-import ListaClientes from './paginas/clientes/ListaClientes';
+import UsuariosPage from './paginas/usuarios/UsuariosPage';
+import ClientesPage from './paginas/clientes/ClientesPage';
+import AccesosPage from './paginas/accesos/AccesosPage';
 import Login from './paginas/Login';
-import DetalleAccesos from './paginas/accesos/DetalleAccesos';
-import DetalleClientes from './paginas/clientes/DetalleClientes';
-import DetalleUsuario from './paginas/usuarios/DetalleUsuario';
+import PrivateRoute from './componentes/comunes/PrivateRoute';
 import { AuthProvider } from './contextos/AuthContext';
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { GetUsuarioProvider } from './contextos/GetUsuarioContext';
+import { CreateUsuarioProvider } from './contextos/CreateUsuarioContext';
+import { DeleteUsuarioProvider } from './contextos/DeleteUsuarioContext';
+import { UpdateUsuarioProvider } from './contextos/UpdateUsuarioContext';
+import { GetClienteProvider } from './contextos/Cliente/GetClienteContext';
+import { CreateClienteProvider } from './contextos/Cliente/CreateClienteContext';
+import { DeleteClienteProvider } from './contextos/Cliente/DeleteClienteContext';
+import { UpdateClienteProvider } from './contextos/Cliente/UpdateClienteContext';
+import { TarjetaDashboardValorProvider } from './contextos/TarjetaDashboardValorContext';
+import { GetUltimoAccesoProvider } from './contextos/acceso/GetUltimoAccesoContext';
+import { CreateAccesoProvider } from './contextos/acceso/CreateAccesoContext';
+import { AccesoGetClienteProvider } from './contextos/acceso/AccesoGetClienteContext'; // Importación del nuevo contexto
 
 function App() {
   return (
     <Router>
       <AuthProvider>
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
-          <Navbar />
-          <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/usuarios/ListaUsuarios" element={<ListaUsuarios />} />
-            <Route path="/usuarios/DetalleUsuario" element={<DetalleUsuario />} />
-            <Route path="/accesos/ListaAccesos" element={<ListaAccesos />} />
-            <Route path="/accesos/DetalleAccesos" element={<DetalleAccesos />} />
-            <Route path="/clientes/ListaClientes" element={<ListaClientes />} />
-            <Route path="/clientes/DetalleClientes" element={<DetalleClientes />} />
-            <Route path="*" element={<div>Página no encontrada</div>} />
-          </Routes>
-        </LocalizationProvider>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route element={<PrivateRoute />}>
+            <Route
+              path="/dashboard"
+              element={
+                <TarjetaDashboardValorProvider>
+                  <Dashboard />
+                </TarjetaDashboardValorProvider>
+              }
+            />
+            <Route
+              path="/usuarios"
+              element={
+                <GetUsuarioProvider>
+                  <CreateUsuarioProvider>
+                    <UpdateUsuarioProvider>
+                      <DeleteUsuarioProvider>
+                        <UsuariosPage />
+                      </DeleteUsuarioProvider>
+                    </UpdateUsuarioProvider>
+                  </CreateUsuarioProvider>
+                </GetUsuarioProvider>
+              }
+            />
+            <Route
+              path="/clientes"
+              element={
+                <GetClienteProvider>
+                  <CreateClienteProvider>
+                    <UpdateClienteProvider>
+                      <DeleteClienteProvider>
+                        <ClientesPage />
+                      </DeleteClienteProvider>
+                    </UpdateClienteProvider>
+                  </CreateClienteProvider>
+                </GetClienteProvider>
+              }
+            />
+            <Route
+              path="/accesos"
+              element={
+                <AccesoGetClienteProvider> {/* Proveedor para AccesosPage */}
+                  <GetUltimoAccesoProvider>
+                    <CreateAccesoProvider>
+                      <AccesosPage />
+                    </CreateAccesoProvider>
+                  </GetUltimoAccesoProvider>
+                </AccesoGetClienteProvider>
+              }
+            />
+          </Route>
+          <Route path="*" element={<div>Página no encontrada</div>} />
+        </Routes>
       </AuthProvider>
     </Router>
   );

@@ -5,12 +5,11 @@ namespace GestorAccesosClub.Dominio.Entities
     public class Acceso
     {
         public int AccesoId { get; set; }
-        public int UsuarioId { get; set; }
+        public int ClienteId { get; set; }
         public DateTime FechaAcceso { get; set; }
-        public TipoAcceso TipoAcceso { get; set; }
+        public TipoAcceso TipoAcceso { get; set; } // Usando el enum TipoAcceso
 
-        // Relación
-        public Usuario Usuario { get; set; }
+        public Cliente Cliente { get; set; } // Relación con Cliente
     }
 }
 

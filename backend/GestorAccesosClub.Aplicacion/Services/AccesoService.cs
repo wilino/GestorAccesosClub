@@ -5,6 +5,7 @@ using GestorAccesosClub.Dominio.Entities;
 using GestorAccesosClub.Dominio.Enums;
 using GestorAccesosClub.Infraestructura.Repositories.Implementaciones;
 using GestorAccesosClub.Infraestructura.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace GestorAccesosClub.Aplicacion.Services
 {
@@ -21,11 +22,13 @@ namespace GestorAccesosClub.Aplicacion.Services
         {
             var acceso = new Acceso
             {
-                UsuarioId = parametros.UsuarioId,
-                TipoAcceso = parametros.TipoAcceso
+                ClienteId = parametros.ClienteId,
+                TipoAcceso = parametros.TipoAcceso,
+                FechaAcceso=parametros.FechaAcceso,
+
             };
 
-            await _accesoRepository.CrearAsync(acceso);
+            await _accesoRepository.CrearAccesoAPelo(acceso);
             return acceso;
         }
 
@@ -38,6 +41,8 @@ namespace GestorAccesosClub.Aplicacion.Services
             }
 
             acceso.TipoAcceso = parametros.TipoAcceso;
+            acceso.FechaAcceso = parametros.FechaAcceso;
+          
             await _accesoRepository.ActualizarAsync(acceso);
             return true;
         }
@@ -76,6 +81,15 @@ namespace GestorAccesosClub.Aplicacion.Services
             return await _accesoRepository.ObtenerAccesosEnRangoFechaAsync(fechaInicio, fechaFin);
         }
 
+        public async Task<object> ObtenerUltimoAccesoPorClienteAsync(int clienteId)
+        {
+            return await _accesoRepository.ObtenerUltimoAccesoPorClienteAsync(clienteId);
+        }
+
+        public async Task<object> ObtenerAccesosPorClienteAsync(int clienteId)
+        {
+            return await _accesoRepository.ObtenerAccesosPorClienteAsync(clienteId);
+        }
     }
 }
 

@@ -3,8 +3,8 @@ namespace GestorAccesosClub.Dominio.Enums
 {
     public enum TipoAcceso
     {
-        Entrada = 0,
-        Salida = 1
+        Entrada = 1,
+        Salida = 2
     }
 }
 

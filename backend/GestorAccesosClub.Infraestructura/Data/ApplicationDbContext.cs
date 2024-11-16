@@ -1,5 +1,4 @@
-﻿// Infraestructura/Data/ApplicationDbContext.cs
-using GestorAccesosClub.Dominio.Entities;
+﻿using GestorAccesosClub.Dominio.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace GestorAccesosClub.Infraestructura.Data
@@ -18,6 +17,22 @@ namespace GestorAccesosClub.Infraestructura.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            // Configuración de la tabla Roles
+            modelBuilder.Entity<Rol>(entity =>
+            {
+                entity.Property(r => r.Nombre)
+                      .IsRequired()
+                      .HasMaxLength(50);
+
+                entity.Property(r => r.Descripcion)
+                      .HasMaxLength(255);
+
+                entity.HasMany(r => r.Usuarios)
+                      .WithOne(u => u.Rol)
+                      .HasForeignKey(u => u.RolId)
+                      .OnDelete(DeleteBehavior.SetNull);
+            });
+
             // Configuración de la tabla Usuarios
             modelBuilder.Entity<Usuario>(entity =>
             {
@@ -34,7 +49,10 @@ namespace GestorAccesosClub.Infraestructura.Data
                       .HasMaxLength(255);
 
                 entity.Property(u => u.Estado)
-                      .HasConversion<int>(); // Mapea el enum EstadoUsuario como un entero
+                      .HasConversion<int>(); // Mapea el enum Estado como un entero
+
+                entity.Property(u => u.FechaCreacion)
+                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 entity.HasOne(u => u.Rol)
                       .WithMany(r => r.Usuarios)
@@ -45,16 +63,25 @@ namespace GestorAccesosClub.Infraestructura.Data
             // Configuración de la tabla Clientes
             modelBuilder.Entity<Cliente>(entity =>
             {
+                entity.Property(c => c.Nombre)
+                      .IsRequired()
+                      .HasMaxLength(100);
+
+                entity.Property(c => c.Email)
+                      .IsRequired()
+                      .HasMaxLength(100);
+
                 entity.Property(c => c.Direccion)
                       .HasMaxLength(255);
 
                 entity.Property(c => c.Telefono)
                       .HasMaxLength(50);
 
-                entity.HasOne(c => c.Usuario)
-                      .WithOne()
-                      .HasForeignKey<Cliente>(c => c.UsuarioId)
-                      .OnDelete(DeleteBehavior.Cascade);
+                entity.Property(c => c.Estado)
+                      .HasConversion<int>(); // Mapea el enum Estado como un entero
+
+                entity.Property(c => c.TipoCliente)
+                      .HasConversion<int>(); // Mapea el enum TipoCliente como un entero
             });
 
             // Configuración de la tabla Accesos
@@ -66,26 +93,10 @@ namespace GestorAccesosClub.Infraestructura.Data
                 entity.Property(a => a.TipoAcceso)
                       .HasConversion<int>(); // Mapea el enum TipoAcceso como un entero
 
-                entity.HasOne(a => a.Usuario)
-                      .WithMany(u => u.Accesos)
-                      .HasForeignKey(a => a.UsuarioId)
+                entity.HasOne(a => a.Cliente)
+                      .WithMany()
+                      .HasForeignKey(a => a.ClienteId)
                       .OnDelete(DeleteBehavior.Cascade);
-            });
-
-            // Configuración de la tabla Roles
-            modelBuilder.Entity<Rol>(entity =>
-            {
-                entity.Property(r => r.Nombre)
-                      .IsRequired()
-                      .HasMaxLength(50);
-
-                entity.Property(r => r.Descripcion)
-                      .HasMaxLength(255);
-
-                entity.HasMany(r => r.Usuarios)
-                      .WithOne(u => u.Rol)
-                      .HasForeignKey(u => u.RolId)
-                      .OnDelete(DeleteBehavior.SetNull);
             });
         }
     }

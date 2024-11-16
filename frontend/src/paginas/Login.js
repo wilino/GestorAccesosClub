@@ -1,25 +1,26 @@
 // src/paginas/Login.js
 import React, { useState } from 'react';
-import { Box, TextField, Button, Typography, Alert } from '@mui/material';
+import { Box, TextField, Button, Typography, Alert, CircularProgress } from '@mui/material';
 import { useAuth } from '../contextos/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-  const { iniciarSesion } = useAuth();
+  const { iniciarSesion, loading, error } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const navigate = useNavigate();
+  const [formError, setFormError] = useState(null);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setError('');
+    setFormError(null);
 
-    try {
-      await iniciarSesion({ email, password });
-      navigate('/dashboard'); // Redirigir a dashboard al iniciar sesión correctamente
-    } catch (e) {
-      setError('Credenciales incorrectas. Por favor, intente de nuevo.');
+    const success = await iniciarSesion({ email, password });
+
+    if (success) {
+      navigate('/dashboard'); // Redirige al dashboard si la autenticación es exitosa
+    } else {
+      setFormError('No se pudo iniciar sesión. Por favor, verifique sus credenciales.');
     }
   };
 
@@ -39,9 +40,9 @@ const Login = () => {
       <Typography variant="h5" color="secondary" align="center" sx={{ mb: 2 }}>
         Iniciar Sesión
       </Typography>
-      {error && (
+      {(formError || error) && (
         <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
+          {formError || error}
         </Alert>
       )}
       <TextField
@@ -54,6 +55,7 @@ const Login = () => {
         required
         value={email}
         onChange={(e) => setEmail(e.target.value)}
+        disabled={loading}
       />
       <TextField
         fullWidth
@@ -65,6 +67,7 @@ const Login = () => {
         required
         value={password}
         onChange={(e) => setPassword(e.target.value)}
+        disabled={loading}
       />
       <Button
         fullWidth
@@ -72,8 +75,9 @@ const Login = () => {
         variant="contained"
         color="secondary"
         sx={{ mt: 2 }}
+        disabled={loading}
       >
-        Iniciar Sesión
+        {loading ? <CircularProgress size={24} color="inherit" /> : 'Iniciar Sesión'}
       </Button>
     </Box>
   );

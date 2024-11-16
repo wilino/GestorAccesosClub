@@ -13,7 +13,6 @@ CREATE TABLE Roles (
 -- Poblar la tabla Roles con los roles necesarios
 INSERT INTO Roles (Nombre, Descripcion) VALUES
 ('admin', 'Administrador del sistema con acceso completo'),
-('cliente', 'Cliente del club con acceso limitado'),
 ('personal_autorizado', 'Personal autorizado para gestionar accesos y clientes');
 
 -- Tabla Usuarios
@@ -31,17 +30,16 @@ CREATE TABLE Usuarios (
 -- Tabla Clientes
 CREATE TABLE Clientes (
     ClienteId INT AUTO_INCREMENT PRIMARY KEY,
-    UsuarioId INT NOT NULL,
     Direccion VARCHAR(255),
     Telefono VARCHAR(50),
-    FOREIGN KEY (UsuarioId) REFERENCES Usuarios(UsuarioId) ON DELETE CASCADE
+    TipoCliente INT NOT NULL -- 1 Miembro, 1 Visitante
 );
 
 -- Tabla Accesos
 CREATE TABLE Accesos (
     AccesoId INT AUTO_INCREMENT PRIMARY KEY,
-    UsuarioId INT NOT NULL,
+    ClienteId INT NOT NULL,
     FechaAcceso DATETIME DEFAULT CURRENT_TIMESTAMP,
     TipoAcceso INT NOT NULL, -- 0 para Entrada, 1 para Salida
-    FOREIGN KEY (UsuarioId) REFERENCES Usuarios(UsuarioId) ON DELETE CASCADE
+    FOREIGN KEY (ClienteId) REFERENCES Clientes(ClienteId) ON DELETE CASCADE
 );

@@ -26,12 +26,22 @@ namespace GestorAccesosClub.Aplicacion.Services
 
         public async Task<Usuario> Crear(CrearUsuarioParametros parametros)
         {
+
+            var usuarioExistente = await ObtenerPorEmailAsync(parametros.Email);
+
+            if (usuarioExistente != null)
+            {
+                return null;
+            }
+
             var usuario = new Usuario
             {
                 Nombre = parametros.Nombre,
                 Email = parametros.Email,
                 Contraseña = parametros.Contraseña,
-                RolId = parametros.RolId
+                RolId = parametros.RolId,
+                FechaCreacion = DateTime.Now,
+                Estado=1
             };
 
             await _usuarioRepository.CrearAsync(usuario);
@@ -49,6 +59,7 @@ namespace GestorAccesosClub.Aplicacion.Services
             usuario.Nombre = parametros.Nombre;
             usuario.Email = parametros.Email;
             usuario.RolId = parametros.RolId;
+            usuario.Contraseña = parametros.Contraseña;
 
             await _usuarioRepository.ActualizarAsync(usuario);
             return true;

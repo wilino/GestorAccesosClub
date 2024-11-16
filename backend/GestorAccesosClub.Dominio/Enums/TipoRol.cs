@@ -3,8 +3,7 @@
     public enum TipoRol
     {
         Admin = 1,
-        Cliente = 2,
-        personal_autorizado = 3
+        personal_autorizado = 2
     }
 }
 

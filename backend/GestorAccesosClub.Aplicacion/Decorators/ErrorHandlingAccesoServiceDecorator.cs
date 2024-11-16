@@ -44,5 +44,31 @@ namespace GestorAccesosClub.Aplicacion.Decorators
                 throw;
             }
         }
+
+       public async Task<object> ObtenerUltimoAccesoPorClienteAsync(int clienteId)
+        {
+            try
+            {
+                return await _accesoService.ObtenerUltimoAccesoPorClienteAsync(clienteId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error al obtener accesos para el cliente: {clienteId}");
+                throw;
+            }
+        }
+
+        public async Task<object> ObtenerAccesosPorClienteAsync(int clienteId)
+        {
+            try
+            {
+                return await _accesoService.ObtenerAccesosPorClienteAsync(clienteId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error al obtener accesos para el cliente: {clienteId}");
+                throw;
+            }
+        }
     }
 }

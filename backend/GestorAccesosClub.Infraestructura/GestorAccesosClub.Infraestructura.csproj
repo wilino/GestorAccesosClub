@@ -15,16 +15,19 @@
     <None Remove="Repositories\" />
     <None Remove="Repositories\Implementaciones\" />
     <None Remove="Repositories\Interfaces\" />
-    <None Remove="Decorators\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Data\" />
     <Folder Include="Repositories\" />
     <Folder Include="Repositories\Implementaciones\" />
     <Folder Include="Repositories\Interfaces\" />
-    <Folder Include="Decorators\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GestorAccesosClub.Dominio\GestorAccesosClub.Dominio.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Decorators\RepositoryErrorHandlingDecorator.cs" />
+    <Compile Remove="Decorators\RepositoryDecorator.cs" />
+    <Compile Remove="Decorators\RepositoryLoggingDecorator.cs" />
   </ItemGroup>
 </Project>

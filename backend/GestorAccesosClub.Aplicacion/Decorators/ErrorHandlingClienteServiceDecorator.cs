@@ -17,18 +17,6 @@ namespace GestorAccesosClub.Aplicacion.Decorators
             _logger = logger;
         }
 
-        public async Task<IEnumerable<Cliente>> ObtenerClientesPorUsuarioIdAsync(int usuarioId)
-        {
-            try
-            {
-                return await _clienteService.ObtenerClientesPorUsuarioIdAsync(usuarioId);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al obtener clientes para el usuario con ID {UsuarioId}", usuarioId);
-                throw;
-            }
-        }
     }
 }
 

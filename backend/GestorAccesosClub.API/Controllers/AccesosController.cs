@@ -138,6 +138,54 @@ namespace GestorAccesosClub.API.Controllers
             var accesos = await _accesoService.ObtenerAccesosEnRangoFechaAsync(fechaInicio, fechaFin);
             return Ok(new ApiResponse(accesos, $"Lista de accesos entre {fechaInicio} y {fechaFin} obtenida con éxito"));
         }
+
+
+        /// <summary>
+        /// Obtiene el último acceso registrado para un cliente específico.
+        /// </summary>
+        /// <param name="clienteId">ID del cliente.</param>
+        /// <returns>Último acceso del cliente.</returns>
+        [HttpGet("ultimo-acceso/{clienteId}")]
+        public async Task<IActionResult> GetUltimoAccesoPorCliente(int clienteId)
+        {
+            try
+            {
+                var ultimoAcceso = await _accesoService.ObtenerUltimoAccesoPorClienteAsync(clienteId);
+
+                return Ok(new ApiResponse(ultimoAcceso, "Último acceso obtenido con éxito"));
+            }
+            catch(Exception ex)
+            {
+                var response = new ApiResponse(null, "No se encontró un registro de acceso para este cliente");
+                response.HasErrors = true;
+                response.Errors.Add($"El cliente con ID {clienteId} no tiene accesos registrados.");
+                return NotFound(response);
+            }
+        }
+
+
+        /// <summary>
+        /// Obtiene el último acceso registrado para un cliente específico.
+        /// </summary>
+        /// <param name="clienteId">ID del cliente.</param>
+        /// <returns>todos los acceso del cliente.</returns>
+        [HttpGet("accesos-cliente/{clienteId}")]
+        public async Task<IActionResult> GetAccesosPorCliente(int clienteId)
+        {
+            try
+            {
+                var ultimoAcceso = await _accesoService.ObtenerAccesosPorClienteAsync(clienteId);
+
+                return Ok(new ApiResponse(ultimoAcceso, "Último acceso obtenido con éxito"));
+            }
+            catch (Exception ex)
+            {
+                var response = new ApiResponse(null, "No se encontró un registro de acceso para este cliente");
+                response.HasErrors = true;
+                response.Errors.Add($"El cliente con ID {clienteId} no tiene accesos registrados.");
+                return NotFound(response);
+            }
+        }
     }
 }
 

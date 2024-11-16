@@ -1,4 +1,6 @@
-﻿namespace GestorAccesosClub.Dominio.Entities
+﻿using GestorAccesosClub.Dominio.Enums;
+
+namespace GestorAccesosClub.Dominio.Entities
 {
     public class Usuario
     {
@@ -13,6 +15,8 @@
         // Relación
         public Rol Rol { get; set; }
         public ICollection<Acceso> Accesos { get; set; }
+
+        public string TipoRolNombre => ((TipoRol)RolId).ToString();
     }
 
 }

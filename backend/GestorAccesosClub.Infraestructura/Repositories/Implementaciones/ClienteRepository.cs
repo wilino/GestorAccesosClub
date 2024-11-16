@@ -12,10 +12,7 @@ namespace GestorAccesosClub.Infraestructura.Repositories.Implementaciones
         {
         }
 
-        public async Task<IEnumerable<Cliente>> ObtenerClientesPorUsuarioIdAsync(int usuarioId)
-        {
-            return await _dbSet.Where(c => c.UsuarioId == usuarioId).ToListAsync();
-        }
+
     }
 }
 

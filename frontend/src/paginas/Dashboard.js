@@ -1,60 +1,57 @@
 // src/paginas/Dashboard.js
 import React from 'react';
 import { Box, Container, Grid, Typography } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contextos/AuthContext';
 import TarjetaDashboard from '../componentes/comunes/TarjetaDashboard';
+import { TarjetaDashboardValorProvider } from '../contextos/TarjetaDashboardValorContext';
 
 const Dashboard = () => {
-  const navigate = useNavigate();
-  const { usuario } = useAuth();
-
   const tarjetas = [
-    {
-      titulo: 'Accesos',
-      descripcion: 'Revisa y gestiona los accesos registrados en el club.',
-      ruta: '/accesos/ListaAccesos',
-      valor: 'Total de Accesos: 102',
-    },
     {
       titulo: 'Clientes',
       descripcion: 'Administra la información de los clientes.',
       ruta: '/clientes/ListaClientes',
-      valor: 'Total de Clientes: 45',
+      endpoint: '/Dashboard/totalClientes',
+      label: 'Total de Clientes',
+      keyName: 'totalClientes',
     },
     {
       titulo: 'Usuarios',
       descripcion: 'Gestiona los usuarios registrados en el sistema.',
       ruta: '/usuarios/ListaUsuarios',
-      valor: 'Total de Usuarios: 20',
+      endpoint: '/Dashboard/totalUsuarios',
+      label: 'Total de Usuarios',
+      keyName: 'totalUsuarios',
     },
   ];
 
   return (
-    <Container>
-      <Box sx={{ mt: 3, mb: 3 }}>
-        <Typography variant="h4" color="secondary" gutterBottom>
-          Bienvenido, {usuario?.nombre || 'Usuario'}!
-        </Typography>
-        <Typography variant="h6" color="primary" sx={{ color: '#b2a429', marginBottom: 2 }}>
-          Resumen del Club VIP
-        </Typography>
-      </Box>
+    <TarjetaDashboardValorProvider>
+      <Container>
+        <Box sx={{ mt: 3, mb: 3 }}>
+          <Typography variant="h4" color="secondary" gutterBottom>
+            Bienvenido al Dashboard
+          </Typography>
+          <Typography variant="h6" color="primary" sx={{ color: '#b2a429', marginBottom: 2 }}>
+            Resumen del Club VIP
+          </Typography>
+        </Box>
 
-      <Grid container spacing={3}>
-        {tarjetas.map((tarjeta, index) => (
-          <Grid item xs={12} md={4} key={index}>
-            <TarjetaDashboard
-              titulo={tarjeta.titulo}
-              descripcion={tarjeta.descripcion}
-              valor={tarjeta.valor}
-              ruta={tarjeta.ruta}
-              onNavigate={navigate}
-            />
-          </Grid>
-        ))}
-      </Grid>
-    </Container>
+        <Grid container spacing={3}>
+          {tarjetas.map((tarjeta, index) => (
+            <Grid item xs={12} md={4} key={index}>
+              <TarjetaDashboard
+                titulo={tarjeta.titulo}
+                descripcion={tarjeta.descripcion}
+                ruta={tarjeta.ruta}
+                keyName={tarjeta.keyName}
+                endpoint={tarjeta.endpoint}
+                label={tarjeta.label}
+              />
+            </Grid>
+          ))}
+        </Grid>
+      </Container>
+    </TarjetaDashboardValorProvider>
   );
 };
 

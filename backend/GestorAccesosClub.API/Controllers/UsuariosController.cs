@@ -1,12 +1,19 @@
 ﻿using GestorAccesosClub.Aplicacion.Interfaces;
 using GestorAccesosClub.API.Models;
+using GestorAccesosClub.API.Decorators;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using GestorAccesosClub.Aplicacion.Parametros.Usuarios;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace GestorAccesosClub.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize] // Protege todos los métodos
+    [ServiceFilter(typeof(ApiErrorHandlingDecorator))] // Aplica el decorador para el manejo de errores
     public class UsuariosController : ControllerBase
     {
         private readonly IUsuarioService _usuarioService;
@@ -29,7 +36,11 @@ namespace GestorAccesosClub.API.Controllers
                 usuario.UsuarioId,
                 usuario.Nombre,
                 usuario.Email,
-                usuario.FechaCreacion
+                usuario.FechaCreacion,
+                usuario.Contraseña,
+                Rol = usuario.TipoRolNombre,
+                usuario.RolId
+                
             });
 
             return Ok(new ApiResponse(result, "Lista de usuarios obtenida con éxito"));
@@ -65,11 +76,12 @@ namespace GestorAccesosClub.API.Controllers
         }
 
         /// <summary>
-        /// Crea un nuevo usuario.
+        /// Crea un nuevo usuario. Solo el personal autorizado o administradores pueden realizar esta acción.
         /// </summary>
         /// <param name="parametros">Parámetros para crear un usuario.</param>
         /// <returns>Usuario creado.</returns>
         [HttpPost]
+        [Authorize(Roles = "admin,personal_autorizado")] // Restringe por roles
         public async Task<IActionResult> CreateUsuario([FromBody] CrearUsuarioParametros parametros)
         {
             if (!ModelState.IsValid)
@@ -77,7 +89,20 @@ namespace GestorAccesosClub.API.Controllers
                 return BadRequest(new ApiResponse(null, "Datos no válidos"));
             }
 
+            // Verificar el rol explícitamente si es necesario
+            var userRole = User.FindFirstValue(ClaimTypes.Role);
+            if (userRole != "admin" && userRole != "personal_autorizado")
+            {
+                return Forbid("No tienes permisos para realizar esta acción.");
+            }
+
             var nuevoUsuario = await _usuarioService.Crear(parametros);
+
+            if (nuevoUsuario == null)
+            {
+                return BadRequest(new ApiResponse(null, "El usuario ya fue registrado"));
+            }
+
             var result = new
             {
                 nuevoUsuario.UsuarioId,
@@ -111,7 +136,7 @@ namespace GestorAccesosClub.API.Controllers
                 return NotFound(response);
             }
 
-            return Ok(new ApiResponse(null, "Usuario actualizado exitosamente"));
+            return Ok(new ApiResponse(parametros, "Usuario actualizado exitosamente"));
         }
 
         /// <summary>
@@ -158,7 +183,8 @@ namespace GestorAccesosClub.API.Controllers
                 usuario.UsuarioId,
                 usuario.Nombre,
                 usuario.Email,
-                usuario.FechaCreacion
+                usuario.FechaCreacion,
+                Rol = usuario.TipoRolNombre 
             };
 
             return Ok(new ApiResponse(result, "Usuario obtenido con éxito"));

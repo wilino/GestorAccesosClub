@@ -8,7 +8,7 @@ using GestorAccesosClub.Infraestructura.Data;
 using GestorAccesosClub.Infraestructura.Repositories.Implementaciones;
 using Scrutor;
 using GestorAccesosClub.Infraestructura.Repositories.Interfaces;
-using GestorAccesosClub.Infraestructura.Decorators;
+//using GestorAccesosClub.Infraestructura.Decorators;
 using GestorAccesosClub.API.Decorators;
 
 namespace GestorAccesosClub.API.Configurations
@@ -32,15 +32,16 @@ namespace GestorAccesosClub.API.Configurations
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
             // Decoradores para el repositorio genérico
-            services.TryDecorate(typeof(IRepository<>), typeof(RepositoryLoggingDecorator<>));
-            services.TryDecorate(typeof(IRepository<>), typeof(RepositoryErrorHandlingDecorator<>));
-            services.TryDecorate(typeof(IRepository<>), typeof(RepositoryDecorator<>));
+            //services.TryDecorate(typeof(IRepository<>), typeof(RepositoryLoggingDecorator<>));
+            //services.TryDecorate(typeof(IRepository<>), typeof(RepositoryErrorHandlingDecorator<>));
+            //services.TryDecorate(typeof(IRepository<>), typeof(RepositoryDecorator<>));
 
             // Registro de Servicios de Aplicación
             services.AddScoped<IUsuarioService, UsuarioService>();
             services.AddScoped<IClienteService, ClienteService>();
             services.AddScoped<IAccesoService, AccesoService>();
             services.AddScoped<IRolService, RolService>();
+            services.AddScoped<IDashboardService, DashboardService>();
 
             // Registro de IAuthService y AuthService para autenticación
             services.AddScoped<IAuthService, AuthService>();
@@ -50,6 +51,8 @@ namespace GestorAccesosClub.API.Configurations
             services.Decorate<IClienteService, ErrorHandlingClienteServiceDecorator>();
             services.Decorate<IAccesoService, ErrorHandlingAccesoServiceDecorator>();
             services.Decorate<IRolService, ErrorHandlingRolServiceDecorator>();
+
+            services.AddScoped<ApiErrorHandlingDecorator>();
 
             return services;
         }

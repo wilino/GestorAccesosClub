@@ -4,6 +4,20 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Obtener la URL del frontend desde appsettings.json
+var frontendUrl = builder.Configuration["Cors:FrontendUrl"];
+
+// Configurar CORS para permitir solicitudes desde la URL especificada
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("FrontendCORS", policy =>
+    {
+        policy.WithOrigins(frontendUrl)
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 // Agregar servicios de la aplicación
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -66,6 +80,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// Activar la política de CORS
+app.UseCors("FrontendCORS");
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
