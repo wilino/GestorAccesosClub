@@ -1,56 +1,61 @@
 import React, { useState, useEffect } from 'react';
-import { Box, TextField, Button, CircularProgress, Typography, MenuItem } from '@mui/material';
+import { Box, Button, CircularProgress, Grid, TextField, Typography, MenuItem } from '@mui/material';
 import { useCreateCliente } from '../../contextos/Cliente/CreateClienteContext';
 import { useUpdateCliente } from '../../contextos/Cliente/UpdateClienteContext';
 
-const FormularioCliente = ({ initialData = {}, onSuccess, onError }) => {
-  const safeInitialData = initialData || {};
-
-  const [clienteId, setClienteId] = useState(safeInitialData.clienteId || null);
-  const [nombre, setNombre] = useState(safeInitialData.nombre || '');
-  const [email, setEmail] = useState(safeInitialData.email || '');
-  const [direccion, setDireccion] = useState(safeInitialData.direccion || '');
-  const [telefono, setTelefono] = useState(safeInitialData.telefono || '');
-  const [estado, setEstado] = useState(safeInitialData.estado || 1); // Default: Activo
-  const [tipoCliente, setTipoCliente] = useState(safeInitialData.tipoCliente || 1); // Default: Miembro
+const FormularioCliente = ({ initialData, isEditing, onSuccess, onError, onCancel }) => {
+  const [clienteId, setClienteId] = useState(null);
+  const [nombre, setNombre] = useState('');
+  const [email, setEmail] = useState('');
+  const [direccion, setDireccion] = useState('');
+  const [telefono, setTelefono] = useState('');
+  const [estado, setEstado] = useState(1); // Por defecto Activo
+  const [tipoCliente, setTipoCliente] = useState(1); // Por defecto Miembro
 
   const { createCliente, loading: creating } = useCreateCliente();
   const { updateCliente, loading: updating } = useUpdateCliente();
 
-  useEffect(() => {
-    if (initialData) {
-      setClienteId(safeInitialData.clienteId || null);
-      setNombre(safeInitialData.nombre || '');
-      setEmail(safeInitialData.email || '');
-      setDireccion(safeInitialData.direccion || '');
-      setTelefono(safeInitialData.telefono || '');
-      setEstado(safeInitialData.estado || 1);
-      setTipoCliente(safeInitialData.tipoCliente || 1);
-    } else {
-      clearForm();
-    }
-  }, [initialData]);
+ useEffect(() => {
+  if (initialData) {
+    setClienteId(initialData.clienteId || null); // Asegúrate de que clienteId se está asignando correctamente
+    setNombre(initialData.nombre || '');
+    setEmail(initialData.email || '');
+    setDireccion(initialData.direccion || '');
+    setTelefono(initialData.telefono || '');
+    setEstado(initialData.estado || 1);
+    setTipoCliente(initialData.tipoCliente || 1);
+  } else {
+    clearForm();
+  }
+}, [initialData]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const clienteData = { clienteId, nombre, email, direccion, telefono, estado, tipoCliente };
-
+  const handleCreate = async () => {
     try {
-      let response;
-      if (clienteId) {
-        response = await updateCliente(clienteData);
-      } else {
-        response = await createCliente(clienteData);
-      }
-
+      const clienteData = { nombre, email, direccion, telefono, estado, tipoCliente };
+      const response = await createCliente(clienteData);
       if (response?.success) {
-        onSuccess(response.message, !!clienteId); // Llama a la función para manejar el éxito
-        clearForm(); // Limpia el formulario siempre después de una operación exitosa
+        onSuccess(response.message, false); // Indica que es creación
+        clearForm();
       } else {
-        onError(response?.message || 'Ha ocurrido un error inesperado');
+        onError(response?.message || 'Error al crear cliente');
       }
     } catch (error) {
-      onError('Ha ocurrido un error inesperado');
+      onError('Error inesperado al crear cliente');
+    }
+  };
+
+  const handleUpdate = async () => {
+    try {
+      const clienteData = { clienteId, nombre, email, direccion, telefono, estado, tipoCliente };
+      const response = await updateCliente(clienteData);
+      if (response?.success) {
+        onSuccess(response.message, true); // Indica que es actualización
+        clearForm();
+      } else {
+        onError(response?.message || 'Error al actualizar cliente');
+      }
+    } catch (error) {
+      onError('Error inesperado al actualizar cliente');
     }
   };
 
@@ -67,103 +72,122 @@ const FormularioCliente = ({ initialData = {}, onSuccess, onError }) => {
   return (
     <Box
       component="form"
-      onSubmit={handleSubmit}
       sx={{
-        mt: 3,
-        width: '90%',
-        mx: 'auto',
         backgroundColor: '#212121',
-        padding: 4,
+        padding: 3,
         borderRadius: 2,
+        boxShadow: 3,
       }}
     >
       <Typography variant="h5" color="secondary" align="center" sx={{ mb: 2 }}>
-        {clienteId ? 'Editar Cliente' : 'Registrar Nuevo Cliente'}
+        {isEditing ? 'Editar Cliente' : 'Registrar Nuevo Cliente'}
       </Typography>
-      <TextField
-        fullWidth
-        label="Nombre"
-        value={nombre}
-        onChange={(e) => setNombre(e.target.value)}
-        margin="normal"
-        variant="outlined"
-        color="secondary"
-        required
-        disabled={creating || updating}
-      />
-      <TextField
-        fullWidth
-        label="Correo Electrónico"
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        margin="normal"
-        variant="outlined"
-        color="secondary"
-        required
-        disabled={creating || updating}
-      />
-      <TextField
-        fullWidth
-        label="Dirección"
-        value={direccion}
-        onChange={(e) => setDireccion(e.target.value)}
-        margin="normal"
-        variant="outlined"
-        color="secondary"
-        disabled={creating || updating}
-      />
-      <TextField
-        fullWidth
-        label="Teléfono"
-        value={telefono}
-        onChange={(e) => setTelefono(e.target.value)}
-        margin="normal"
-        variant="outlined"
-        color="secondary"
-        disabled={creating || updating}
-      />
-      <TextField
-        fullWidth
-        select
-        label="Estado"
-        value={estado}
-        onChange={(e) => setEstado(e.target.value)}
-        margin="normal"
-        variant="outlined"
-        color="secondary"
-        required
-        disabled={creating || updating}
-      >
-        <MenuItem value={1}>Activo</MenuItem>
-        <MenuItem value={2}>Inactivo</MenuItem>
-        <MenuItem value={3}>Suspendido</MenuItem>
-      </TextField>
-      <TextField
-        fullWidth
-        select
-        label="Tipo de Cliente"
-        value={tipoCliente}
-        onChange={(e) => setTipoCliente(e.target.value)}
-        margin="normal"
-        variant="outlined"
-        color="secondary"
-        required
-        disabled={creating || updating}
-      >
-        <MenuItem value={1}>Miembro</MenuItem>
-        <MenuItem value={2}>Visitante</MenuItem>
-      </TextField>
-      <Button
-        fullWidth
-        type="submit"
-        variant="contained"
-        color="secondary"
-        sx={{ mt: 2 }}
-        disabled={creating || updating}
-      >
-        {creating || updating ? <CircularProgress size={24} color="inherit" /> : clienteId ? 'Actualizar Cliente' : 'Crear Cliente'}
-      </Button>
+
+      <Grid container spacing={2}>
+        {/* Campos del formulario */}
+        <Grid item xs={12} md={6}>
+          <TextField
+            label="Nombre *"
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
+            fullWidth
+            required
+            inputProps={{ maxLength: 100 }}
+          />
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <TextField
+            label="Correo Electrónico *"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            fullWidth
+            required
+          />
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <TextField
+            label="Dirección"
+            value={direccion}
+            onChange={(e) => setDireccion(e.target.value)}
+            fullWidth
+          />
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <TextField
+            label="Teléfono"
+            value={telefono}
+            onChange={(e) => setTelefono(e.target.value)}
+            fullWidth
+          />
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <TextField
+            label="Estado *"
+            select
+            value={estado}
+            onChange={(e) => setEstado(Number(e.target.value))}
+            fullWidth
+            required
+          >
+            <MenuItem value={1}>Activo</MenuItem>
+            <MenuItem value={2}>Inactivo</MenuItem>
+            <MenuItem value={3}>Suspendido</MenuItem>
+          </TextField>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <TextField
+            label="Tipo de Cliente *"
+            select
+            value={tipoCliente}
+            onChange={(e) => setTipoCliente(Number(e.target.value))}
+            fullWidth
+            required
+          >
+            <MenuItem value={1}>Miembro</MenuItem>
+            <MenuItem value={2}>Visitante</MenuItem>
+          </TextField>
+        </Grid>
+      </Grid>
+
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
+        <Button
+          type="button"
+          variant="outlined"
+          onClick={() => {
+            clearForm();
+            onCancel();
+          }}
+          disabled={creating || updating}
+          sx={{ color: '#DAA520', borderColor: '#DAA520' }}
+        >
+          Limpiar
+        </Button>
+
+        {!isEditing && (
+          <Button
+            type="button"
+            variant="contained"
+            onClick={handleCreate}
+            disabled={creating}
+            sx={{ backgroundColor: '#DAA520', color: '#000', '&:hover': { backgroundColor: '#C2921D' } }}
+          >
+            {creating ? <CircularProgress size={24} color="inherit" /> : 'Crear Cliente'}
+          </Button>
+        )}
+
+        {isEditing && (
+          <Button
+            type="button"
+            variant="contained"
+            onClick={handleUpdate}
+            disabled={updating}
+            sx={{ backgroundColor: '#DAA520', color: '#000', '&:hover': { backgroundColor: '#C2921D' } }}
+          >
+            {updating ? <CircularProgress size={24} color="inherit" /> : 'Actualizar Cliente'}
+          </Button>
+        )}
+      </Box>
     </Box>
   );
 };

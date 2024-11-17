@@ -1,34 +1,35 @@
 import React, { useState } from 'react';
 import { Box, Container, Typography, Snackbar, Alert } from '@mui/material';
+import PersonIcon from '@mui/icons-material/Person';
 import FormularioCliente from '../../componentes/clientes/FormularioCliente';
 import ClienteTable from '../../componentes/clientes/ClienteTable';
 import { useGetCliente } from '../../contextos/Cliente/GetClienteContext';
 import { useDeleteCliente } from '../../contextos/Cliente/DeleteClienteContext';
+import PageHeader from '../../componentes/comunes/PageHeader';
 
 const ClientesPage = () => {
   const { clientes, fetchClientes } = useGetCliente();
   const { deleteCliente, error: deleteError } = useDeleteCliente();
   const [selectedCliente, setSelectedCliente] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
-  // Maneja la edición de un cliente
   const handleEdit = (cliente) => {
-    setSelectedCliente(cliente); // Carga los datos en el formulario para editar
+    setSelectedCliente(cliente);
+    setIsEditing(true);
   };
 
-  // Maneja la eliminación de un cliente
   const handleDelete = async (clienteId) => {
     const success = await deleteCliente(clienteId);
     if (success) {
       setSnackbar({ open: true, message: 'Cliente eliminado correctamente', severity: 'success' });
-      fetchClientes(); // Actualiza la lista después de eliminar
+      fetchClientes();
     } else {
       setSnackbar({ open: true, message: 'Error al eliminar el cliente', severity: 'error' });
     }
   };
 
-  // Maneja la creación o actualización de un cliente
   const handleUpdateOrCreate = (success, message, isEdit) => {
     setSnackbar({
       open: true,
@@ -37,21 +38,28 @@ const ClientesPage = () => {
     });
 
     if (success) {
-      fetchClientes(); // Actualiza la lista de clientes
-      setSelectedCliente(null); // Limpia el formulario
+      fetchClientes();
+      setSelectedCliente(null);
+      setIsEditing(false);
     }
   };
 
-  // Cierra el snackbar
+  const handleCancelEdit = () => {
+    setSelectedCliente(null);
+    setIsEditing(false);
+  };
+
   const handleCloseSnackbar = () => {
     setSnackbar({ open: false, message: '', severity: 'success' });
   };
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" align="center" gutterBottom>
-        Gestión de Clientes
-      </Typography>
+      <PageHeader
+        title="Gestión de Clientes"
+        subtitle="Registra y administra la información de los clientes"
+        icon={<PersonIcon sx={{ fontSize: 40, color: '#FFD700' }} />} 
+      />
       <Box
         sx={{
           display: 'flex',
@@ -64,14 +72,16 @@ const ClientesPage = () => {
         }}
       >
         <FormularioCliente
-          initialData={selectedCliente} // Carga datos para editar si existen
-          onSuccess={(message, isEdit) => handleUpdateOrCreate(true, message, isEdit)} // Manejo exitoso
-          onError={(message) => handleUpdateOrCreate(false, message)} // Manejo de error
+          initialData={selectedCliente}
+          isEditing={isEditing}
+          onSuccess={(message, isEdit) => handleUpdateOrCreate(true, message, isEdit)}
+          onError={(message) => handleUpdateOrCreate(false, message)}
+          onCancel={handleCancelEdit}
         />
         <ClienteTable
-          clientes={clientes} // Lista de clientes
-          onEdit={handleEdit} // Acción de editar
-          onDelete={handleDelete} // Acción de eliminar
+          clientes={clientes}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
         />
         {deleteError && (
           <Typography color="error">

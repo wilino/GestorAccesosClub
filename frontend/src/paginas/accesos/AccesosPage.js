@@ -28,7 +28,11 @@ const AccesosPage = () => {
       const clientesActualizados = await Promise.all(
         clientes.map(async (cliente) => {
           const ultimoAcceso = await getUltimoAcceso(cliente.clienteId);
-          return { ...cliente, ultimoAcceso };
+          return {
+            ...cliente,
+            clienteId: cliente.clienteId || cliente.id, // Asegurar clienteId
+            ultimoAcceso,
+          };
         })
       );
 
@@ -45,21 +49,24 @@ const AccesosPage = () => {
   }, [clientes, getUltimoAcceso]);
 
   const handleAcceso = (cliente, tipo) => {
-    setSelectedCliente(cliente);
+    console.log('Cliente seleccionado:', cliente); // Confirmamos el cliente y su id
+    const clienteData = {
+      ...cliente,
+      clienteId: cliente.id, // Aseguramos que se utilice el identificador correcto
+    };
+    setSelectedCliente(clienteData);
     setTipoAcceso(tipo);
     setShowPopup(true);
   };
 
   const handleConfirmarAcceso = async (fechaHora) => {
     try {
-      // Registrar acceso
       await createAcceso({
         clienteId: selectedCliente.clienteId,
         tipoAcceso: tipoAcceso === 'entrada' ? 1 : 2,
         fechaAcceso: fechaHora,
       });
 
-      // Limpiar almacenamiento local y recargar datos
       localStorage.removeItem('acceso_clientes');
       await fetchUltimosAccesos();
 
@@ -84,16 +91,12 @@ const AccesosPage = () => {
     const filtrarClientes = clientesConUltimosAccesos.filter((cliente) => {
       return (
         (!filtros.nombre || cliente.nombre.toLowerCase().includes(filtros.nombre)) &&
-        (!filtros.email || cliente.email.toLowerCase().includes(filtros.email)) &&
-        (filtros.tipoCliente === null || cliente.tipoCliente === filtros.tipoCliente) &&
-        (filtros.estado === null || cliente.estado === filtros.estado)
+        (!filtros.email || cliente.email.toLowerCase().includes(filtros.email))
       );
     });
 
     setClientesFiltrados(filtrarClientes);
   };
-
-
 
   const handleCloseSnackbar = () => setSnackbar({ open: false, message: '', severity: 'success' });
 
@@ -105,8 +108,7 @@ const AccesosPage = () => {
       <PageHeader
         title="Accesos al Club"
         subtitle="Registra y gestiona las entradas y salidas"
-        onButtonClick={() => console.log('Nuevo acceso')}
-        icon={<DoorFrontIcon sx={{ fontSize: 40, color: '#FFD700' }} />} // Ícono personalizado
+        icon={<DoorFrontIcon sx={{ fontSize: 40, color: '#FFD700' }} />}
       />
 
       <Box

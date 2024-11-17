@@ -7,10 +7,13 @@ const PopupAcceso = ({ open, cliente, tipoAcceso, onConfirmar, onClose }) => {
   const [fechaHora, setFechaHora] = useState(new Date().toISOString().slice(0, 16)); // Fecha inicial actual
 
   const handleConfirmar = async () => {
-    if (!cliente) return;
+    if (!cliente || !cliente.clienteId) {
+      console.error('Cliente o clienteId es null. Verifica que el cliente sea correctamente pasado al popup.');
+      return;
+    }
 
     const parametros = {
-      clienteId: cliente.clienteId,
+      clienteId: cliente.clienteId, // Confirmar que se envía correctamente
       tipoAcceso: tipoAcceso === 'entrada' ? 1 : 2,
       fechaAcceso: fechaHora,
     };
