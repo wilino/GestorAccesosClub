@@ -15,26 +15,26 @@ const FormularioCliente = ({ initialData, isEditing, onSuccess, onError, onCance
   const { createCliente, loading: creating } = useCreateCliente();
   const { updateCliente, loading: updating } = useUpdateCliente();
 
- useEffect(() => {
-  if (initialData) {
-    setClienteId(initialData.clienteId || null); // Asegúrate de que clienteId se está asignando correctamente
-    setNombre(initialData.nombre || '');
-    setEmail(initialData.email || '');
-    setDireccion(initialData.direccion || '');
-    setTelefono(initialData.telefono || '');
-    setEstado(initialData.estado || 1);
-    setTipoCliente(initialData.tipoCliente || 1);
-  } else {
-    clearForm();
-  }
-}, [initialData]);
+  useEffect(() => {
+    if (initialData) {
+      setClienteId(initialData.clienteId || null);
+      setNombre(initialData.nombre || '');
+      setEmail(initialData.email || '');
+      setDireccion(initialData.direccion || '');
+      setTelefono(initialData.telefono || '');
+      setEstado(initialData.estado || 1);
+      setTipoCliente(initialData.tipoCliente || 1);
+    } else {
+      clearForm();
+    }
+  }, [initialData]);
 
   const handleCreate = async () => {
     try {
       const clienteData = { nombre, email, direccion, telefono, estado, tipoCliente };
       const response = await createCliente(clienteData);
       if (response?.success) {
-        onSuccess(response.message, false); // Indica que es creación
+        onSuccess(response.message, false);
         clearForm();
       } else {
         onError(response?.message || 'Error al crear cliente');
@@ -49,7 +49,7 @@ const FormularioCliente = ({ initialData, isEditing, onSuccess, onError, onCance
       const clienteData = { clienteId, nombre, email, direccion, telefono, estado, tipoCliente };
       const response = await updateCliente(clienteData);
       if (response?.success) {
-        onSuccess(response.message, true); // Indica que es actualización
+        onSuccess(response.message, true);
         clearForm();
       } else {
         onError(response?.message || 'Error al actualizar cliente');
@@ -73,18 +73,26 @@ const FormularioCliente = ({ initialData, isEditing, onSuccess, onError, onCance
     <Box
       component="form"
       sx={{
-        backgroundColor: '#212121',
+        backgroundColor: 'background.paper',
         padding: 3,
         borderRadius: 2,
-        boxShadow: 3,
+        boxShadow: 4,
+        border: '1px solid',
+        borderColor: 'divider',
+        maxWidth: 600,
+        margin: '0 auto',
       }}
     >
-      <Typography variant="h5" color="secondary" align="center" sx={{ mb: 2 }}>
+      <Typography
+        variant="h5"
+        color="primary"
+        align="center"
+        sx={{ mb: 3, fontWeight: 'bold', textTransform: 'uppercase' }}
+      >
         {isEditing ? 'Editar Cliente' : 'Registrar Nuevo Cliente'}
       </Typography>
 
       <Grid container spacing={2}>
-        {/* Campos del formulario */}
         <Grid item xs={12} md={6}>
           <TextField
             label="Nombre *"
@@ -150,7 +158,7 @@ const FormularioCliente = ({ initialData, isEditing, onSuccess, onError, onCance
         </Grid>
       </Grid>
 
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
         <Button
           type="button"
           variant="outlined"
@@ -159,30 +167,28 @@ const FormularioCliente = ({ initialData, isEditing, onSuccess, onError, onCance
             onCancel();
           }}
           disabled={creating || updating}
-          sx={{ color: '#DAA520', borderColor: '#DAA520' }}
+          sx={{ color: 'primary.main', borderColor: 'primary.main' }}
         >
           Limpiar
         </Button>
-
         {!isEditing && (
           <Button
             type="button"
             variant="contained"
             onClick={handleCreate}
             disabled={creating}
-            sx={{ backgroundColor: '#DAA520', color: '#000', '&:hover': { backgroundColor: '#C2921D' } }}
+            sx={{ backgroundColor: 'primary.main', '&:hover': { backgroundColor: 'primary.dark' } }}
           >
             {creating ? <CircularProgress size={24} color="inherit" /> : 'Crear Cliente'}
           </Button>
         )}
-
         {isEditing && (
           <Button
             type="button"
             variant="contained"
             onClick={handleUpdate}
             disabled={updating}
-            sx={{ backgroundColor: '#DAA520', color: '#000', '&:hover': { backgroundColor: '#C2921D' } }}
+            sx={{ backgroundColor: 'primary.main', '&:hover': { backgroundColor: 'primary.dark' } }}
           >
             {updating ? <CircularProgress size={24} color="inherit" /> : 'Actualizar Cliente'}
           </Button>

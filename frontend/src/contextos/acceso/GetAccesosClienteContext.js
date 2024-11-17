@@ -10,21 +10,21 @@ export const GetAccesosClienteProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+
   const fetchAccesosCliente = async (clienteId) => {
-    setLoading(true);
-    setError(null);
     try {
-      const response = await axios.get(`/api/Accesos/accesos-cliente/${clienteId}`);
-      const data = response.data?.data || [];
-      setAccesos(data);
-      return data; // Retorna los datos obtenidos
-    } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Error al obtener los accesos';
-      setError(errorMessage);
-      console.error(errorMessage);
-      return [];
-    } finally {
-      setLoading(false);
+      console.log(`Fetching accesos for clienteId: ${clienteId}`);
+      const response = await axios.get(`/Accesos/accesos-cliente/${clienteId}`);
+      if (response?.data) {
+        setAccesos(response.data.data); // Actualiza el estado con los datos
+        return response.data.data; // Devuelve los datos
+      } else {
+        console.error('Error: Respuesta inválida del servidor');
+        throw new Error('Respuesta inválida del servidor');
+      }
+    } catch (error) {
+      console.error('Error al obtener los accesos:', error);
+      throw error; // Lanza el error para manejarlo externamente
     }
   };
 

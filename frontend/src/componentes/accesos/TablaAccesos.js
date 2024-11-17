@@ -4,7 +4,7 @@ import { Button, Box, ThemeProvider } from '@mui/material';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import LogoutIcon from '@mui/icons-material/Logout';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import tema from '../../temas/tema'; // Importar el tema global
+import tema from '../../temas/tema'; 
 
 const formatFecha = (fecha) => {
   if (!fecha) return 'Sin fecha';
@@ -63,7 +63,7 @@ const TablaAccesos = ({ clientes = [], onAcceso, onVerAccesos }) => {
           color="info"
           variant="contained"
           size="small"
-          onClick={() => onVerAccesos(params.row)}
+          onClick={() => onVerAccesos(params.row)} // Llama a la función con el cliente seleccionado
         >
           Ver Accesos
         </Button>

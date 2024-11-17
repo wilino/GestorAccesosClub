@@ -19,7 +19,8 @@ import { UpdateClienteProvider } from './contextos/Cliente/UpdateClienteContext'
 import { TarjetaDashboardValorProvider } from './contextos/TarjetaDashboardValorContext';
 import { GetUltimoAccesoProvider } from './contextos/acceso/GetUltimoAccesoContext';
 import { CreateAccesoProvider } from './contextos/acceso/CreateAccesoContext';
-import { AccesoGetClienteProvider } from './contextos/acceso/AccesoGetClienteContext'; // Importación del nuevo contexto
+import { AccesoGetClienteProvider } from './contextos/acceso/AccesoGetClienteContext';
+import { GetAccesosClienteProvider } from './contextos/acceso/GetAccesosClienteContext'; // Importación del nuevo proveedor
 
 function App() {
   return (
@@ -68,10 +69,12 @@ function App() {
             <Route
               path="/accesos"
               element={
-                <AccesoGetClienteProvider> {/* Proveedor para AccesosPage */}
+                <AccesoGetClienteProvider>
                   <GetUltimoAccesoProvider>
                     <CreateAccesoProvider>
-                      <AccesosPage />
+                      <GetAccesosClienteProvider> 
+                        <AccesosPage />
+                      </GetAccesosClienteProvider>
                     </CreateAccesoProvider>
                   </GetUltimoAccesoProvider>
                 </AccesoGetClienteProvider>

@@ -4,21 +4,26 @@ import DoorFrontIcon from '@mui/icons-material/DoorFront';
 import FiltrosAcceso from '../../componentes/accesos/FiltrosAcceso';
 import TablaAccesos from '../../componentes/accesos/TablaAccesos';
 import PopupAcceso from '../../componentes/accesos/PopupAcceso';
+import PopupReporteAcceso from '../../componentes/accesos/PopupReporteAcceso';
 import { useAccesoGetCliente } from '../../contextos/acceso/AccesoGetClienteContext';
-import { useGetUltimoAcceso } from '../../contextos/acceso/GetUltimoAccesoContext';
+import { useGetAccesosCliente } from '../../contextos/acceso/GetAccesosClienteContext';
 import { useCreateAcceso } from '../../contextos/acceso/CreateAccesoContext';
+import { useGetUltimoAcceso } from '../../contextos/acceso/GetUltimoAccesoContext'; // Asegúrate de importar correctamente el hook
 import PageHeader from '../../componentes/comunes/PageHeader';
 
 const AccesosPage = () => {
   const { clientes, loading, error } = useAccesoGetCliente();
-  const { getUltimoAcceso } = useGetUltimoAcceso();
+  const { fetchAccesosCliente } = useGetAccesosCliente();
   const { createAcceso } = useCreateAcceso();
+  const { getUltimoAcceso } = useGetUltimoAcceso(); // Usamos el hook getUltimoAcceso
 
   const [clientesConUltimosAccesos, setClientesConUltimosAccesos] = useState([]);
   const [clientesFiltrados, setClientesFiltrados] = useState([]);
   const [selectedCliente, setSelectedCliente] = useState(null);
   const [tipoAcceso, setTipoAcceso] = useState('');
   const [showPopup, setShowPopup] = useState(false);
+  const [showPopupReporte, setShowPopupReporte] = useState(false);
+  const [accesos, setAccesos] = useState([]);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
   const fetchUltimosAccesos = async () => {
@@ -27,10 +32,10 @@ const AccesosPage = () => {
     try {
       const clientesActualizados = await Promise.all(
         clientes.map(async (cliente) => {
-          const ultimoAcceso = await getUltimoAcceso(cliente.clienteId);
+          const ultimoAcceso = await getUltimoAcceso(cliente.clienteId); // Usamos getUltimoAcceso aquí
           return {
             ...cliente,
-            clienteId: cliente.clienteId || cliente.id, // Asegurar clienteId
+            clienteId: cliente.clienteId || cliente.id, // Aseguramos que el clienteId esté presente
             ultimoAcceso,
           };
         })
@@ -46,17 +51,33 @@ const AccesosPage = () => {
 
   useEffect(() => {
     fetchUltimosAccesos();
-  }, [clientes, getUltimoAcceso]);
+  }, [clientes, getUltimoAcceso]); // Asegúrate de incluir getUltimoAcceso como dependencia
 
   const handleAcceso = (cliente, tipo) => {
-    console.log('Cliente seleccionado:', cliente); // Confirmamos el cliente y su id
     const clienteData = {
       ...cliente,
-      clienteId: cliente.id, // Aseguramos que se utilice el identificador correcto
+      clienteId: cliente.id,
     };
     setSelectedCliente(clienteData);
     setTipoAcceso(tipo);
     setShowPopup(true);
+  };
+
+  const handleVerAccesos = async (cliente) => {
+    try {
+      const clienteId = cliente.id; // Obtén el ID del cliente
+      if (clienteId) {
+        console.log('Cargando accesos para el cliente con ID:', clienteId);
+        const fetchedAccesos = await fetchAccesosCliente(clienteId); // Llama al servicio
+        setAccesos(fetchedAccesos); // Actualiza el estado con los accesos
+        setSelectedCliente(cliente); // Selecciona el cliente actual
+        setShowPopupReporte(true); // Muestra el popup
+      } else {
+        console.error('Cliente ID no disponible');
+      }
+    } catch (error) {
+      console.error('Error al cargar los accesos:', error);
+    }
   };
 
   const handleConfirmarAcceso = async (fechaHora) => {
@@ -122,8 +143,13 @@ const AccesosPage = () => {
         }}
       >
         <FiltrosAcceso onFiltrar={handleFiltrar} />
-        <TablaAccesos clientes={clientesFiltrados} onAcceso={handleAcceso} />
+        <TablaAccesos
+          clientes={clientesFiltrados}
+          onAcceso={handleAcceso}
+          onVerAccesos={handleVerAccesos}
+        />
       </Box>
+
       <PopupAcceso
         open={showPopup}
         cliente={selectedCliente}
@@ -131,6 +157,14 @@ const AccesosPage = () => {
         onConfirmar={handleConfirmarAcceso}
         onClose={() => setShowPopup(false)}
       />
+
+      <PopupReporteAcceso
+        open={showPopupReporte}
+        cliente={selectedCliente}
+        accesos={accesos}
+        onClose={() => setShowPopupReporte(false)}
+      />
+
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}
