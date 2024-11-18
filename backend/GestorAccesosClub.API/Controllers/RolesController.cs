@@ -2,6 +2,7 @@
 using GestorAccesosClub.API.Models;
 using GestorAccesosClub.Aplicacion.Interfaces;
 using GestorAccesosClub.Aplicacion.Parametros.Roles;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GestorAccesosClub.API.Controllers
@@ -22,6 +23,7 @@ namespace GestorAccesosClub.API.Controllers
         /// </summary>
         /// <returns>Lista de roles.</returns>
         [HttpGet]
+       
         public async Task<IActionResult> GetRoles()
         {
             var roles = await _rolService.ObtenerTodos();

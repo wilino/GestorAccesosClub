@@ -28,6 +28,7 @@ namespace GestorAccesosClub.API.Controllers
         /// </summary>
         /// <returns>Lista de usuarios con campos seleccionados.</returns>
         [HttpGet]
+        [Authorize(Roles = "admin, personal_autorizado")]
         public async Task<IActionResult> GetUsuarios()
         {
             var usuarios = await _usuarioService.ObtenerTodos();
@@ -40,7 +41,7 @@ namespace GestorAccesosClub.API.Controllers
                 usuario.Contraseña,
                 Rol = usuario.TipoRolNombre,
                 usuario.RolId
-                
+
             });
 
             return Ok(new ApiResponse(result, "Lista de usuarios obtenida con éxito"));
@@ -81,7 +82,7 @@ namespace GestorAccesosClub.API.Controllers
         /// <param name="parametros">Parámetros para crear un usuario.</param>
         /// <returns>Usuario creado.</returns>
         [HttpPost]
-        [Authorize(Roles = "admin,personal_autorizado")] // Restringe por roles
+        [Authorize(Roles = "admin")] // Restringe por roles
         public async Task<IActionResult> CreateUsuario([FromBody] CrearUsuarioParametros parametros)
         {
             if (!ModelState.IsValid)
@@ -91,7 +92,7 @@ namespace GestorAccesosClub.API.Controllers
 
             // Verificar el rol explícitamente si es necesario
             var userRole = User.FindFirstValue(ClaimTypes.Role);
-            if (userRole != "admin" && userRole != "personal_autorizado")
+            if (userRole != "admin" )
             {
                 return Forbid("No tienes permisos para realizar esta acción.");
             }
@@ -119,6 +120,7 @@ namespace GestorAccesosClub.API.Controllers
         /// <param name="parametros">Parámetros para actualizar el usuario.</param>
         /// <returns>Resultado de la actualización.</returns>
         [HttpPut]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> UpdateUsuario([FromBody] ActualizarUsuarioParametros parametros)
         {
             if (!ModelState.IsValid)
@@ -145,6 +147,7 @@ namespace GestorAccesosClub.API.Controllers
         /// <param name="id">ID del usuario a eliminar.</param>
         /// <returns>Resultado de la eliminación.</returns>
         [HttpDelete("{id}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteUsuario(int id)
         {
             var eliminado = await _usuarioService.Eliminar(id);
@@ -166,6 +169,7 @@ namespace GestorAccesosClub.API.Controllers
         /// <param name="email">Correo electrónico del usuario.</param>
         /// <returns>Usuario con campos seleccionados.</returns>
         [HttpGet("email/{email}")]
+        [Authorize(Roles = "admin, personal_autorizado")]
         public async Task<IActionResult> GetUsuarioPorEmail(string email)
         {
             var usuario = await _usuarioService.ObtenerPorEmailAsync(email);
@@ -184,7 +188,7 @@ namespace GestorAccesosClub.API.Controllers
                 usuario.Nombre,
                 usuario.Email,
                 usuario.FechaCreacion,
-                Rol = usuario.TipoRolNombre 
+                Rol = usuario.TipoRolNombre
             };
 
             return Ok(new ApiResponse(result, "Usuario obtenido con éxito"));

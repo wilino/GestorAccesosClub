@@ -16,35 +16,63 @@ export const AuthProvider = ({ children }) => {
   // Configurar token de Axios desde localStorage al cargar
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    const expirationTime = localStorage.getItem('tokenExpiration');
+
+    if (token && expirationTime) {
+      const now = new Date().getTime();
+
+      if (now >= parseInt(expirationTime)) {
+        cerrarSesion();
+      } else {
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        iniciarExpiracion(parseInt(expirationTime) - now);
+      }
     }
   }, []);
 
-  // Función para obtener los datos del usuario
+  const iniciarExpiracion = (delay) => {
+    setTimeout(() => {
+      cerrarSesion();
+      alert('Tu sesión ha expirado. Por favor, vuelve a iniciar sesión.');
+    }, delay);
+  };
+
+  const calcularProximaExpiracion = () => {
+    const now = new Date();
+    const nextExpiration = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      Math.ceil(now.getHours() / 6) * 6
+    );
+
+    return nextExpiration.getTime();
+  };
+
   const obtenerUsuario = async (email) => {
     const usuarioResponse = await axios.get(`/Usuarios/email/${email}`);
     return usuarioResponse.data.data;
   };
 
-  // Función para iniciar sesión
   const iniciarSesion = async ({ email, password }) => {
     setLoading(true);
     setError(null);
 
     try {
-      // Solicita el token al backend
       const response = await axios.post('/Auth/login', { email, password });
       const { token } = response.data;
 
-      // Guarda el token y configura los headers
+      const expirationTime = calcularProximaExpiracion();
+
       localStorage.setItem('token', token);
+      localStorage.setItem('tokenExpiration', expirationTime.toString());
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-      // Obtiene los datos completos del usuario
       const usuarioData = await obtenerUsuario(email);
       setUsuario(usuarioData);
       localStorage.setItem('usuario', JSON.stringify(usuarioData));
+
+      iniciarExpiracion(expirationTime - new Date().getTime());
 
       setLoading(false);
       return true;
@@ -57,21 +85,19 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Función para cerrar sesión
   const cerrarSesion = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('usuario');
+    localStorage.removeItem('tokenExpiration');
     delete axios.defaults.headers.common['Authorization'];
     setUsuario(null);
   };
 
-  // Función para actualizar los datos del usuario
   const actualizarUsuario = (nuevosDatos) => {
     setUsuario(nuevosDatos);
     localStorage.setItem('usuario', JSON.stringify(nuevosDatos));
   };
 
-  // Interceptor para manejar errores de autenticación
   useEffect(() => {
     const interceptor = axios.interceptors.response.use(
       (response) => response,

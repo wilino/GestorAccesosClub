@@ -1,14 +1,18 @@
 ﻿using System;
+using GestorAccesosClub.API.Decorators;
 using GestorAccesosClub.API.Models;
 using GestorAccesosClub.Aplicacion.Interfaces;
 using GestorAccesosClub.Aplicacion.Parametros.Accesos;
 using GestorAccesosClub.Dominio.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GestorAccesosClub.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
+    [ServiceFilter(typeof(ApiErrorHandlingDecorator))]
     public class AccesosController : ControllerBase
     {
         private readonly IAccesoService _accesoService;
@@ -23,6 +27,7 @@ namespace GestorAccesosClub.API.Controllers
         /// </summary>
         /// <returns>Lista de accesos.</returns>
         [HttpGet]
+        [Authorize(Roles = "personal_autorizado")]
         public async Task<IActionResult> GetAccesos()
         {
             var accesos = await _accesoService.ObtenerTodos();
@@ -35,6 +40,7 @@ namespace GestorAccesosClub.API.Controllers
         /// <param name="id">ID del acceso.</param>
         /// <returns>Acceso con el ID especificado.</returns>
         [HttpGet("{id}")]
+        [Authorize(Roles = "personal_autorizado")]
         public async Task<IActionResult> GetAcceso(int id)
         {
             var acceso = await _accesoService.ObtenerPorId(id);
@@ -56,6 +62,7 @@ namespace GestorAccesosClub.API.Controllers
         /// <param name="parametros">Parámetros para crear un acceso.</param>
         /// <returns>Acceso creado.</returns>
         [HttpPost]
+        [Authorize(Roles = "personal_autorizado")]
         public async Task<IActionResult> CreateAcceso([FromBody] CrearAccesoParametros parametros)
         {
             if (!ModelState.IsValid)
@@ -73,6 +80,7 @@ namespace GestorAccesosClub.API.Controllers
         /// <param name="parametros">Parámetros para actualizar el acceso.</param>
         /// <returns>Resultado de la actualización.</returns>
         [HttpPut]
+        [Authorize(Roles = "personal_autorizado")]
         public async Task<IActionResult> UpdateAcceso([FromBody] ActualizarAccesoParametros parametros)
         {
             if (!ModelState.IsValid)
@@ -99,6 +107,7 @@ namespace GestorAccesosClub.API.Controllers
         /// <param name="id">ID del acceso a eliminar.</param>
         /// <returns>Resultado de la eliminación.</returns>
         [HttpDelete("{id}")]
+        [Authorize(Roles = "personal_autorizado")]
         public async Task<IActionResult> DeleteAcceso(int id)
         {
             var eliminado = await _accesoService.Eliminar(id);
@@ -120,6 +129,7 @@ namespace GestorAccesosClub.API.Controllers
         /// <param name="tipoAcceso">Tipo de acceso (entrada o salida).</param>
         /// <returns>Lista de accesos filtrada por tipo.</returns>
         [HttpGet("tipo/{tipoAcceso}")]
+        [Authorize(Roles = "personal_autorizado")]
         public async Task<IActionResult> GetAccesosPorTipo(TipoAcceso tipoAcceso)
         {
             var accesos = await _accesoService.ObtenerAccesosPorTipoAsync(tipoAcceso);
@@ -133,6 +143,7 @@ namespace GestorAccesosClub.API.Controllers
         /// <param name="fechaFin">Fecha de fin.</param>
         /// <returns>Lista de accesos en el rango de fechas.</returns>
         [HttpGet("rango-fechas")]
+        [Authorize(Roles = "personal_autorizado")]
         public async Task<IActionResult> GetAccesosEnRangoFecha(DateTime fechaInicio, DateTime fechaFin)
         {
             var accesos = await _accesoService.ObtenerAccesosEnRangoFechaAsync(fechaInicio, fechaFin);
@@ -146,6 +157,7 @@ namespace GestorAccesosClub.API.Controllers
         /// <param name="clienteId">ID del cliente.</param>
         /// <returns>Último acceso del cliente.</returns>
         [HttpGet("ultimo-acceso/{clienteId}")]
+        [Authorize(Roles = "personal_autorizado")]
         public async Task<IActionResult> GetUltimoAccesoPorCliente(int clienteId)
         {
             try
@@ -170,6 +182,7 @@ namespace GestorAccesosClub.API.Controllers
         /// <param name="clienteId">ID del cliente.</param>
         /// <returns>todos los acceso del cliente.</returns>
         [HttpGet("accesos-cliente/{clienteId}")]
+        [Authorize(Roles = "personal_autorizado")]
         public async Task<IActionResult> GetAccesosPorCliente(int clienteId)
         {
             try

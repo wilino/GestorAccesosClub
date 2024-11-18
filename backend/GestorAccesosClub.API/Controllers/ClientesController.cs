@@ -1,12 +1,16 @@
-﻿using GestorAccesosClub.API.Models;
+﻿using GestorAccesosClub.API.Decorators;
+using GestorAccesosClub.API.Models;
 using GestorAccesosClub.Aplicacion.Interfaces;
 using GestorAccesosClub.Aplicacion.Parametros.Clientes;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GestorAccesosClub.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize] // Protege todos los métodos
+    [ServiceFilter(typeof(ApiErrorHandlingDecorator))] 
     public class ClientesController : ControllerBase
     {
         private readonly IClienteService _clienteService;
@@ -21,6 +25,7 @@ namespace GestorAccesosClub.API.Controllers
         /// </summary>
         /// <returns>Lista de clientes con campos seleccionados.</returns>
         [HttpGet]
+        [Authorize(Roles = "personal_autorizado")]
         public async Task<IActionResult> GetClientes()
         {
             var clientes = await _clienteService.ObtenerTodos();
@@ -43,6 +48,7 @@ namespace GestorAccesosClub.API.Controllers
         /// <param name="id">ID del cliente.</param>
         /// <returns>Cliente con campos seleccionados.</returns>
         [HttpGet("{id}")]
+        [Authorize(Roles = "personal_autorizado")]
         public async Task<IActionResult> GetCliente(int id)
         {
             var cliente = await _clienteService.ObtenerPorId(id);
@@ -75,6 +81,7 @@ namespace GestorAccesosClub.API.Controllers
         /// <param name="parametros">Parámetros para crear un cliente.</param>
         /// <returns>Cliente creado.</returns>
         [HttpPost]
+        [Authorize(Roles = "personal_autorizado")]
         public async Task<IActionResult> CreateCliente([FromBody] CrearClienteParametros parametros)
         {
             if (!ModelState.IsValid)
@@ -92,6 +99,7 @@ namespace GestorAccesosClub.API.Controllers
         /// <param name="parametros">Parámetros para actualizar el cliente.</param>
         /// <returns>Resultado de la actualización.</returns>
         [HttpPut]
+        [Authorize(Roles = "personal_autorizado")]
         public async Task<IActionResult> UpdateCliente([FromBody] ActualizarClienteParametros parametros)
         {
             if (!ModelState.IsValid)
@@ -118,6 +126,7 @@ namespace GestorAccesosClub.API.Controllers
         /// <param name="id">ID del cliente a eliminar.</param>
         /// <returns>Resultado de la eliminación.</returns>
         [HttpDelete("{id}")]
+        [Authorize(Roles = "personal_autorizado")]
         public async Task<IActionResult> DeleteCliente(int id)
         {
             var eliminado = await _clienteService.Eliminar(id);
